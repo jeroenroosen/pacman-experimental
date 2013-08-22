@@ -21,7 +21,6 @@ public class WallSquare extends Square {
 	 *            The sprite for this square.
 	 */
 	public WallSquare(Sprite s) {
-		super();
 		this.sprite = s;
 	}
 

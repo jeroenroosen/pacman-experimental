@@ -7,6 +7,7 @@ import nl.tudelft.jpacman.board.Board;
 import nl.tudelft.jpacman.board.Occupant;
 import nl.tudelft.jpacman.board.Pellet;
 import nl.tudelft.jpacman.board.Square;
+import nl.tudelft.jpacman.sprite.PacManSprites;
 
 /**
  * Basic implementation of a level.
@@ -50,6 +51,10 @@ public class BoardLevel implements Level {
 		this.observers = new ArrayList<>();
 		this.spawnPointIndex = 0;
 		this.players = new ArrayList<>();
+
+		Square square = board.getGhostStartPositions().get(0);
+		new Ghost(new PacManSprites().getGhostSprite(GhostColor.RED))
+				.occupy(square);
 	}
 
 	@Override
@@ -160,6 +165,19 @@ public class BoardLevel implements Level {
 	 */
 	private void collide(Player p, Ghost g) {
 		p.setAlive(false);
+		notifyObserversOnDeath(p);
+	}
+
+	/**
+	 * Notify all observers that a player has died.
+	 * 
+	 * @param p
+	 *            The player that died.
+	 */
+	private void notifyObserversOnDeath(Player p) {
+		for (LevelObserver o : observers) {
+			o.playerDied(p);
+		}
 	}
 
 	/**

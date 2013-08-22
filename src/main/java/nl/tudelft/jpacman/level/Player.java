@@ -2,7 +2,6 @@ package nl.tudelft.jpacman.level;
 
 import java.util.Map;
 
-import nl.tudelft.jpacman.board.AbstractOccupant;
 import nl.tudelft.jpacman.sprite.AnimatedSprite;
 import nl.tudelft.jpacman.sprite.Sprite;
 
@@ -11,9 +10,8 @@ import nl.tudelft.jpacman.sprite.Sprite;
  * 
  * @author Jeroen Roosen <j.roosen@student.tudelft.nl>
  */
-public class Player extends AbstractOccupant {
+public class Player extends DirectionalOccupant {
 
-	private final Map<Direction, Sprite> sprites;
 	private final AnimatedSprite dyingAnimation;
 
 	/**
@@ -28,9 +26,9 @@ public class Player extends AbstractOccupant {
 
 	public Player(Map<Direction, Sprite> pacSprites,
 			AnimatedSprite deathAnimation) {
+		super(pacSprites);
 		score = 0;
 		alive = true;
-		sprites = pacSprites;
 		dyingAnimation = deathAnimation;
 	}
 
@@ -68,7 +66,7 @@ public class Player extends AbstractOccupant {
 	@Override
 	public Sprite getSprite() {
 		if (isAlive()) {
-			return sprites.get(getDirection());
+			return super.getSprite();
 		} else {
 			return dyingAnimation;
 		}
