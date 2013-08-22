@@ -99,7 +99,7 @@ public class MapParser {
 			return factory.newEmptySquare();
 		case '.':
 			Square s = factory.newEmptySquare();
-			s.setPellet(factory.newPellet());
+			factory.newPellet().occupy(s);
 			return s;
 		case 'G':
 			Square ghostSquare = factory.newEmptySquare();

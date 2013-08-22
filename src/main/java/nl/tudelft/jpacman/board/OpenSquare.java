@@ -9,28 +9,18 @@ import nl.tudelft.jpacman.sprite.Sprite;
  */
 public class OpenSquare extends Square {
 
+	/**
+	 * The visual representation of this tile.
+	 */
 	private final Sprite sprite;
 
 	/**
-	 * Creates a new open square.
+	 * Creates a new, empty open square.
 	 * 
 	 * @param s
 	 *            The sprite of this square.
 	 */
 	public OpenSquare(Sprite s) {
-		this(null, s);
-	}
-
-	/**
-	 * Creates a new open square with a pellet on it.
-	 * 
-	 * @param pellet
-	 *            The pellet to put on this square.
-	 * @param s
-	 *            The sprite of this square.
-	 */
-	public OpenSquare(Pellet pellet, Sprite s) {
-		super(pellet);
 		this.sprite = s;
 	}
 

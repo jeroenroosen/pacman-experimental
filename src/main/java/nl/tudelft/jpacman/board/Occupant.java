@@ -20,13 +20,14 @@ public interface Occupant {
 	 * 
 	 * @param square
 	 *            The square to place this occupant on.
+	 * @return <code>true</code> iff the move was successful.
 	 */
-	void occupy(Square square);
+	boolean occupy(Square square);
 
 	/**
 	 * Removes this occupant from the board.
 	 */
-	void remove();
+	void leaveCurrentSquare();
 
 	/**
 	 * @return The square this occupant is occupying, or <code>null</code> if

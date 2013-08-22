@@ -1,22 +1,17 @@
 package nl.tudelft.jpacman.board;
 
 import nl.tudelft.jpacman.level.Player;
-import nl.tudelft.jpacman.sprite.Sprite;
 
 /**
  * The dots Pac-Man has to eat to finish a level.
  * 
  * @author Jeroen Roosen <j.roosen@student.tudelft.nl>
  */
-public interface Pellet {
+public interface Pellet extends Occupant {
 
 	/**
-	 * @return The graphical representation of this pellet.
-	 */
-	Sprite getSprite();
-
-	/**
-	 * Have the player consume this pellet and handle the result.
+	 * Have the player consume this pellet and handle the result, then remove
+	 * the pellet from the board.
 	 * 
 	 * @param consumer
 	 *            The player that consumed this pellet.

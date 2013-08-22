@@ -29,29 +29,13 @@ public abstract class Square {
 	private final List<Occupant> occupants;
 
 	/**
-	 * The pellet, if any, on this square.
-	 */
-	private Pellet pellet;
-
-	/**
-	 * Creates a new square without a pellet.
+	 * Creates a new square.
 	 */
 	public Square() {
-		this(null);
-	}
-	
-	/**
-	 * Creates a new square.
-	 * 
-	 * @param pellet
-	 *            The pellet on this square (which may be <code>null</code>.)
-	 */
-	public Square(Pellet pellet) {
-		this.pellet = pellet;
 		this.occupants = new ArrayList<>();
 		this.adjacentSquares = new EnumMap<>(Direction.class);
 	}
-	
+
 	/**
 	 * @return <code>true</code> iff the occupants of this square all have this
 	 *         square as the square they are occupying.
@@ -64,7 +48,7 @@ public abstract class Square {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * @return An immutable list of occupants, in the order they occupied this
 	 *         square.
@@ -74,48 +58,24 @@ public abstract class Square {
 	}
 
 	/**
-	 * @return The pellet on this square, or <code>null</code> if there isn't
-	 *         any.
-	 */
-	public Pellet getPellet() {
-		return pellet;
-	}
-
-	/**
-	 * Sets the pellet on this square.
-	 * 
-	 * @param p
-	 *            The pellet on this square, which may be <code>null</code> to
-	 *            indicate this square holds no pellet.
-	 */
-	public void setPellet(Pellet p) {
-		this.pellet = p;
-	}
-
-	/**
-	 * Removes the pellet from this square.
-	 * 
-	 * @return The pellet that was removed, or <code>null</code> if there was no
-	 *         pellet.
-	 */
-	public Pellet removePellet() {
-		Pellet prev = getPellet();
-		setPellet(null);
-		return prev;
-	}
-
-	/**
 	 * Places an occupant on this square iff the square type allows for it, or
-	 * does nothing if the occupant was already on this square.
+	 * does nothing if the occupant was already on this square. When a
+	 * {@link Pellet} is added, it is placed at the bottom of the stack instead
+	 * of on top.
 	 * 
 	 * @param occupant
 	 *            The occupant to put on this square.
 	 * @return <code>true</code> iff the occupant occupies this square.
 	 */
-	public boolean put(Occupant occupant) {
+	boolean put(Occupant occupant) {
 		if (isAccessibleTo(occupant)) {
 			if (!occupants.contains(occupant)) {
-				occupants.add(occupant);
+				// TODO replace instanceof
+				if (occupant instanceof Pellet) {
+					occupants.add(0, occupant);
+				} else {
+					occupants.add(occupant);
+				}
 			}
 			assert invariant();
 			return true;
@@ -132,7 +92,7 @@ public abstract class Square {
 	 * @return The occupant that was removed from this square, or
 	 *         <code>null</code> if the occupant was not occupying this square.
 	 */
-	public Occupant remove(Occupant occupant) {
+	Occupant remove(Occupant occupant) {
 		if (occupants.remove(occupant)) {
 			assert invariant();
 			return occupant;
@@ -163,12 +123,12 @@ public abstract class Square {
 	 *         occupant.
 	 */
 	abstract public boolean isAccessibleTo(Occupant occupant);
-	
+
 	/**
 	 * @return This square's graphical representation.
 	 */
 	abstract public Sprite getSprite();
-	
+
 	/**
 	 * Attach an adjacent square to this square, eventually forming a connected
 	 * graph of all squares on a board.

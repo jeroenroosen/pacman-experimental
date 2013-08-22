@@ -78,26 +78,88 @@ public class BoardLevel implements Level {
 	public void move(Occupant occupant, Direction direction) {
 		synchronized (moveLock) {
 			if (!isCompleted()) {
-
 				Square square = occupant.getSquare();
 				Square destination = square.getSquareAt(direction);
 
-				occupant.occupy(destination);
+				boolean moved = occupant.occupy(destination);
 				occupant.setDirection(direction);
 
-				Pellet pellet = destination.getPellet();
-				if (pellet != null && occupant instanceof Player) { // TODO get rid of instanceof
-					pellet.consumedBy((Player) occupant);
+				if (moved) {
+					handleMove(occupant, destination);
 				}
-				
-				// TODO handle collisions.
-				
-				if (isCompleted()) {
-					notifyObserversOnCompletion();
-				}
-
 			}
 		}
+	}
+
+	/**
+	 * Handles the results of an occupant's move.
+	 * 
+	 * @param movedOccupant
+	 *            The occupant that moved onto the square.
+	 * @param destination
+	 *            The destination square.
+	 */
+	private void handleMove(Occupant movedOccupant, Square destination) {
+		doCollisions(destination, movedOccupant);
+
+		if (isCompleted()) {
+			notifyObserversOnCompletion();
+		}
+	}
+
+	/**
+	 * Handles all collisions a new occupant may run into.
+	 * 
+	 * @param destination
+	 *            The square the new occupant entered.
+	 * @param movedOccupant
+	 *            The new occupant.
+	 */
+	private void doCollisions(Square destination, Occupant movedOccupant) {
+		for (Occupant o : destination.getOccupants()) {
+			collide(movedOccupant, o);
+		}
+	}
+
+	/**
+	 * Handles the collision between two occupants trying to occupy the same
+	 * square.
+	 * 
+	 * @param collider
+	 *            The new occupant.
+	 * @param collidee
+	 *            The existing occupant.
+	 */
+	private void collide(Occupant collider, Occupant collidee) {
+		// TODO create some kind of collision table instead?
+
+		if (collider instanceof Player) {
+			Player player = (Player) collider;
+			if (collidee instanceof Ghost) {
+				collide(player, (Ghost) collidee);
+			}
+			if (collidee instanceof Pellet) {
+				Pellet pellet = (Pellet) collidee;
+				pellet.consumedBy(player);
+			}
+		}
+		if (collider instanceof Ghost) {
+			if (collidee instanceof Player) {
+				collide((Player) collidee, (Ghost) collider);
+			}
+		}
+	}
+
+	/**
+	 * Handles the collision of a ghost and a player.
+	 * 
+	 * @param p
+	 *            The player colliding with the ghost.
+	 * @param g
+	 *            The ghost colliding with the player.
+	 */
+	private void collide(Player p, Ghost g) {
+		p.setAlive(false);
 	}
 
 	/**
@@ -122,12 +184,17 @@ public class BoardLevel implements Level {
 	 *         consumed.
 	 */
 	private boolean allPelletsConsumed() {
-		// TODO this method is very inefficient, it would be better to do a
-		// headcount at the start and keep track of the number.
-		for (int y = 0; y < board.getHeight(); y++) {
-			for (int x = 0; x < board.getWidth(); x++) {
-				if (board.squareAt(x, y).getPellet() != null) {
-					return false;
+		// TODO get rid of instanceof check.
+		// TODO very inefficient, think of something different (e.g. scan once,
+		// subtract when needed.)
+		Board b = getBoard();
+		for (int x = 0; x < b.getWidth(); x++) {
+			for (int y = 0; y < b.getHeight(); y++) {
+				Square square = b.squareAt(x, y);
+				for (Occupant o : square.getOccupants()) {
+					if (o instanceof Pellet) {
+						return false;
+					}
 				}
 			}
 		}

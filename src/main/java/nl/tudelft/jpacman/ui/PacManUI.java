@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 
 import nl.tudelft.jpacman.board.Board;
 import nl.tudelft.jpacman.board.Occupant;
-import nl.tudelft.jpacman.board.Pellet;
 import nl.tudelft.jpacman.board.Square;
 import nl.tudelft.jpacman.game.Game;
 import nl.tudelft.jpacman.level.Level;
@@ -32,9 +31,9 @@ import nl.tudelft.jpacman.sprite.Sprite;
 
 public class PacManUI extends JFrame {
 
-	private static final int CELL_HEIGHT = 32;
+	private static final int CELL_HEIGHT = 16;
 
-	private static final int CELL_WIDTH = 32;
+	private static final int CELL_WIDTH = 16;
 
 	/**
 	 * 
@@ -175,13 +174,6 @@ public class PacManUI extends JFrame {
 
 			Sprite squareSprite = square.getSprite();
 			squareSprite.draw(g, x, y, w, h);
-
-			Pellet p = square.getPellet();
-
-			if (p != null) {
-				Sprite pelletSprite = p.getSprite();
-				pelletSprite.draw(g, x, y, w, h);
-			}
 
 			for (Occupant o : square.getOccupants()) {
 				Sprite occupantSprite = o.getSprite();

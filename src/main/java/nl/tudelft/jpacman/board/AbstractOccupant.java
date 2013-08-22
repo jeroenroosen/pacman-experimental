@@ -41,21 +41,25 @@ public abstract class AbstractOccupant implements Occupant {
 	}
 
 	@Override
-	public void occupy(Square square) {
+	public boolean occupy(Square square) {
 		assert square != null;
+		boolean result = false;
 		if (square.isAccessibleTo(this)) {
-			remove();
+			leaveCurrentSquare();
 			square.put(this);
 			base = square;
+			result = true;
 		}
 		assert invariant();
+		return result;
 	}
 
 	@Override
-	public void remove() {
+	public void leaveCurrentSquare() {
 		Square currentBase = getSquare();
 		if (currentBase != null) {
 			currentBase.remove(this);
+			currentBase = null;
 		}
 		assert invariant();
 	}

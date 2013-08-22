@@ -8,7 +8,7 @@ import nl.tudelft.jpacman.sprite.Sprite;
  * 
  * @author Jeroen Roosen <j.roosen@student.tudelft.nl>
  */
-public class SmallPellet implements Pellet {
+public class SmallPellet extends AbstractOccupant implements Pellet {
 
 	/**
 	 * Amount of points obtained by consuming this pellet.
@@ -38,6 +38,7 @@ public class SmallPellet implements Pellet {
 	@Override
 	public void consumedBy(Player consumer) {
 		consumer.addPoints(getPoints());
+		leaveCurrentSquare();
 	}
 
 	@Override
