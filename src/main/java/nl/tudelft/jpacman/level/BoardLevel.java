@@ -7,7 +7,6 @@ import nl.tudelft.jpacman.board.Board;
 import nl.tudelft.jpacman.board.Occupant;
 import nl.tudelft.jpacman.board.Pellet;
 import nl.tudelft.jpacman.board.Square;
-import nl.tudelft.jpacman.level.CollisionInteractions.CollisionEvent;
 import nl.tudelft.jpacman.level.CollisionInteractions.CollisionHandler;
 import nl.tudelft.jpacman.sprite.PacManSprites;
 
@@ -62,16 +61,16 @@ public class BoardLevel implements Level {
 		
 		collisionsInteractions.onCollision(Player.class, Ghost.class, new CollisionHandler<Player, Ghost>() {
 			@Override
-			public void handleCollision(CollisionEvent<Player, Ghost> event) {
-				event.getCollider().setAlive(false);
-				notifyObserversOnDeath(event.getCollider());
+			public void handleCollision(Player player, Ghost ghost) {
+				player.setAlive(false);
+				notifyObserversOnDeath(player);
 			}
 		});
 		
 		collisionsInteractions.onCollision(Player.class, Pellet.class, new CollisionHandler<Player, Pellet>() {
 			@Override
-			public void handleCollision(CollisionEvent<Player, Pellet> event) {
-				event.getCollidee().consumedBy(event.getCollider());
+			public void handleCollision(Player player, Pellet pallet) {
+				pallet.consumedBy(player);
 			}
 		});
 	}

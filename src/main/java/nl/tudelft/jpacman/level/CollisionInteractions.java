@@ -53,8 +53,7 @@ public class CollisionInteractions {
 			return;
 		}
 		
-		CollisionEvent<C1, C2> collisionEvent = new CollisionEvent<>(collider, collidee);
-		collisionHandler.handleCollision(collisionEvent);
+		collisionHandler.handleCollision(collider, collidee);
 	}
 	
 	private Class<? extends Occupant> getMostSpecificClass(Map<Class<? extends Occupant>, ?> map, Class<? extends Occupant> key) {
@@ -91,39 +90,22 @@ public class CollisionInteractions {
 	}
 	
 	public static interface CollisionHandler<C1 extends Occupant, C2 extends Occupant> {
-		void handleCollision(CollisionEvent<C1, C2> event);
+		void handleCollision(C1 collider, C2 collidee);
 	}
 	
-	private static class InverseCollisionHandler<C1 extends Occupant, C2 extends Occupant> implements CollisionHandler<C2, C1> {
+	private static class InverseCollisionHandler<C1 extends Occupant, C2 extends Occupant> implements CollisionHandler<C1, C2> {
 		
 		private final CollisionHandler<C2, C1> handler;
 		
 		public InverseCollisionHandler(CollisionHandler<C2, C1> handler) {
 			this.handler = handler;
 		}
-		
+
 		@Override
-		public void handleCollision(CollisionEvent<C2, C1> event) {
-			handler.handleCollision(new CollisionEvent<C2, C1>(event.getCollider(), event.getCollidee()));
-		}
-	}
-	
-	public static class CollisionEvent<C1 extends Occupant, C2 extends Occupant> {
-		private final C1 collider;
-		private final C2 collidee;
-		
-		private CollisionEvent(C1 collider, C2 collidee) {
-			this.collider = collider;
-			this.collidee = collidee;
+		public void handleCollision(C1 collider, C2 collidee) {
+			handler.handleCollision(collidee, collider);
 		}
 		
-		public C1 getCollider() {
-			return collider;
-		}
-		
-		public C2 getCollidee() {
-			return collidee;
-		}
 	}
 	
 }
