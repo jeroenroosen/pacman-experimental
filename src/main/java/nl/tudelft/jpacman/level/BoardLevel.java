@@ -7,6 +7,8 @@ import nl.tudelft.jpacman.board.Board;
 import nl.tudelft.jpacman.board.Occupant;
 import nl.tudelft.jpacman.board.Pellet;
 import nl.tudelft.jpacman.board.Square;
+import nl.tudelft.jpacman.level.CollisionInteractions.CollisionEvent;
+import nl.tudelft.jpacman.level.CollisionInteractions.CollisionHandler;
 import nl.tudelft.jpacman.sprite.PacManSprites;
 
 /**
@@ -35,6 +37,8 @@ public class BoardLevel implements Level {
 	 * A locking object to ensure moves are not executed at the same time.
 	 */
 	private final Object moveLock = new Object();
+	
+	private final CollisionInteractions collisionsInteractions;
 
 	private final List<Player> players;
 
@@ -48,13 +52,28 @@ public class BoardLevel implements Level {
 		assert levelBoard != null;
 
 		this.board = levelBoard;
+		this.collisionsInteractions = new CollisionInteractions();
 		this.observers = new ArrayList<>();
 		this.spawnPointIndex = 0;
 		this.players = new ArrayList<>();
 
 		Square square = board.getGhostStartPositions().get(0);
-		new Ghost(new PacManSprites().getGhostSprite(GhostColor.RED))
-				.occupy(square);
+		new Ghost(new PacManSprites().getGhostSprite(GhostColor.RED)).occupy(square);
+		
+		collisionsInteractions.onCollision(Player.class, Ghost.class, new CollisionHandler<Player, Ghost>() {
+			@Override
+			public void handleCollision(CollisionEvent<Player, Ghost> event) {
+				event.getCollider().setAlive(false);
+				notifyObserversOnDeath(event.getCollider());
+			}
+		});
+		
+		collisionsInteractions.onCollision(Player.class, Pellet.class, new CollisionHandler<Player, Pellet>() {
+			@Override
+			public void handleCollision(CollisionEvent<Player, Pellet> event) {
+				event.getCollidee().consumedBy(event.getCollider());
+			}
+		});
 	}
 
 	@Override
@@ -136,36 +155,7 @@ public class BoardLevel implements Level {
 	 *            The existing occupant.
 	 */
 	private void collide(Occupant collider, Occupant collidee) {
-		// TODO create some kind of collision table instead?
-
-		if (collider instanceof Player) {
-			Player player = (Player) collider;
-			if (collidee instanceof Ghost) {
-				collide(player, (Ghost) collidee);
-			}
-			if (collidee instanceof Pellet) {
-				Pellet pellet = (Pellet) collidee;
-				pellet.consumedBy(player);
-			}
-		}
-		if (collider instanceof Ghost) {
-			if (collidee instanceof Player) {
-				collide((Player) collidee, (Ghost) collider);
-			}
-		}
-	}
-
-	/**
-	 * Handles the collision of a ghost and a player.
-	 * 
-	 * @param p
-	 *            The player colliding with the ghost.
-	 * @param g
-	 *            The ghost colliding with the player.
-	 */
-	private void collide(Player p, Ghost g) {
-		p.setAlive(false);
-		notifyObserversOnDeath(p);
+		collisionsInteractions.handleCollision(collider, collidee);
 	}
 
 	/**
