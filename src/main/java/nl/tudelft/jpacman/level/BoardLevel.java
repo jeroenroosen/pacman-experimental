@@ -36,7 +36,7 @@ public class BoardLevel implements Level {
 	 * A locking object to ensure moves are not executed at the same time.
 	 */
 	private final Object moveLock = new Object();
-	
+
 	private final CollisionInteractions collisionsInteractions;
 
 	private final List<Player> players;
@@ -57,22 +57,25 @@ public class BoardLevel implements Level {
 		this.players = new ArrayList<>();
 
 		Square square = board.getGhostStartPositions().get(0);
-		new Ghost(new PacManSprites().getGhostSprite(GhostColor.RED)).occupy(square);
-		
-		collisionsInteractions.onCollision(Player.class, Ghost.class, new CollisionHandler<Player, Ghost>() {
-			@Override
-			public void handleCollision(Player player, Ghost ghost) {
-				player.setAlive(false);
-				notifyObserversOnDeath(player);
-			}
-		});
-		
-		collisionsInteractions.onCollision(Player.class, Pellet.class, new CollisionHandler<Player, Pellet>() {
-			@Override
-			public void handleCollision(Player player, Pellet pallet) {
-				pallet.consumedBy(player);
-			}
-		});
+		new Ghost(new PacManSprites().getGhostSprite(GhostColor.RED))
+				.occupy(square);
+
+		collisionsInteractions.onCollision(Player.class, Ghost.class, true,
+				new CollisionHandler<Player, Ghost>() {
+					@Override
+					public void handleCollision(Player player, Ghost ghost) {
+						player.setAlive(false);
+						notifyObserversOnDeath(player);
+					}
+				});
+
+		collisionsInteractions.onCollision(Player.class, Pellet.class,
+				new CollisionHandler<Player, Pellet>() {
+					@Override
+					public void handleCollision(Player player, Pellet pallet) {
+						pallet.consumedBy(player);
+					}
+				});
 	}
 
 	@Override
